@@ -1,10 +1,15 @@
 import axios from 'axios'
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
-export default function AgregarEmpleado() {
+export default function EditarEmpleado() {
+
+    const urlBase = "http://localhost:8080/rh-app/empleados";
 
     let navegacion = useNavigate();
+
+    const {id} = useParams();
+
 
     const [empleado, setEmpleado] = useState({
         nombre:"",
@@ -14,6 +19,15 @@ export default function AgregarEmpleado() {
 
     const{nombre, departamento, sueldo} = empleado
 
+    useEffect(()=>{
+        cargarEmpleado();
+    },[])
+
+    const cargarEmpleado = async () => {
+        const resultado = await axios.get(`${urlBase}/${id}`)
+        setEmpleado(resultado.data); 
+    }
+
     const onInputChange = (e) => {
         //spread operator para expandir o copiar los atributos
         setEmpleado({...empleado, [e.target.name]: e.target.value})
@@ -21,8 +35,7 @@ export default function AgregarEmpleado() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        const urlBase = "http://localhost:8080/rh-app/empleados";
-        await axios.post(urlBase, empleado);
+        await axios.put(`${urlBase}/${id}`, empleado);
         //se redirige a la pagina de inicio
         navegacion('/');
     }
@@ -30,7 +43,7 @@ export default function AgregarEmpleado() {
   return (
     <div className='container'>
         <div className='container text-center' style={{margin: "30px"}}>
-            <h3>Agregar Empleado</h3>
+            <h3>Editar Empleado</h3>
         </div>
         <form onSubmit={(e)=> onSubmit(e)}>
             <div className="mb-3">
@@ -52,7 +65,7 @@ export default function AgregarEmpleado() {
             </div>
 
             <div className='text-center'>
-                <button type="submit" className="btn btn-warning btn-sm me-3">Agregar</button>
+                <button type="submit" className="btn btn-warning btn-sm me-3">Guardar Empleado</button>
                 <a href='/' className='btn btn-danger btn-sm'>Regresar</a>
             </div>
             
